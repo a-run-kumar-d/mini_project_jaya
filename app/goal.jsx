@@ -14,45 +14,111 @@ import { Button, Provider as PaperProvider } from "react-native-paper";
 const questions = [
   {
     id: 1,
-    question: "What equipment are you using today?",
+    question: "Which body part are you focusing on?",
     options: [
-      "Dumbbells",
-      "Barbell",
-      "Resistance Bands",
-      "Bodyweight Only",
-      "Kettlebells",
+      "Chest",
+      "Back",
+      "Legs",
+      "Arms",
+      "Core",
+      "Shoulders",
+      "Neck",
+      "Cardio",
+      "Waist",
     ],
   },
   {
     id: 2,
-    question: "Which body part are you focusing on?",
-    options: ["Chest", "Back", "Legs", "Arms", "Full Body"],
+    question: "Which equipment are you using?",
+    options: [
+      "Dumbbells",
+      "Barbell",
+      "Resistance Bands",
+      "Bodyweight",
+      "Kettlebells",
+      "Machines",
+      "Cardio Machines",
+      "Specialty Equipment",
+    ],
   },
   {
     id: 3,
-    question: "Any additional preparation?",
+    question: "What intensity or preparation level?",
     options: [
       "Stretching",
       "Warm-up Cardio",
       "Foam Rolling",
       "No Additional Prep",
+      "High Intensity",
+      "Moderate Effort",
+      "Light Activity",
     ],
   },
 ];
 
+const equipmentGroups = {
+  Machines: [
+    "Smith Machine",
+    "Sled Machine",
+    "Leverage Machine",
+    "Cable",
+    "Assisted",
+  ],
+  CardioMachines: [
+    "Treadmill",
+    "Bike",
+    "Elliptical",
+    "Skierg Machine",
+    "Upper Body Ergometer (UBE)",
+  ],
+  SpecialtyEquipment: [
+    "Trap Bar",
+    "Bosu Ball",
+    "Medicine Ball",
+    "Rope",
+    "Hammer",
+    "Tire",
+    "Roller",
+  ],
+};
+
 const Goal = () => {
   const navigation = useNavigation();
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false); // Added modalVisible state
+
+  const handleOptionSelect = (option) => {
+    const updatedSelections = [...selectedOptions];
+    updatedSelections[currentQuestion] = option;
+    setSelectedOptions(updatedSelections);
+    setModalVisible(false);
+  };
 
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedOption(null);
     } else {
-      navigation.navigate("hard");
+      generateWorkout();
     }
+  };
+
+  const generateWorkout = () => {
+    console.log("Selected Values:", selectedOptions);
+
+    const selectedEquipment = selectedOptions[1]; // Equipment selection
+
+    if (selectedEquipment === "Machines") {
+      console.log("Machines:", equipmentGroups.Machines);
+    }
+    if (selectedEquipment === "Cardio Machines") {
+      console.log("Cardio Machines:", equipmentGroups.CardioMachines);
+    }
+    if (selectedEquipment === "Specialty Equipment") {
+      console.log("Specialty Equipment:", equipmentGroups.SpecialtyEquipment);
+    }
+
+    navigation.navigate("hard");
   };
 
   return (
@@ -69,7 +135,7 @@ const Goal = () => {
               style={styles.dropdownButton}
             >
               <Text style={styles.dropdownText}>
-                {selectedOption || "Select an option"}
+                {selectedOptions[currentQuestion] || "Select an option"}
               </Text>
             </TouchableOpacity>
 
@@ -80,10 +146,7 @@ const Goal = () => {
                     <TouchableOpacity
                       key={index}
                       style={styles.option}
-                      onPress={() => {
-                        setSelectedOption(option);
-                        setModalVisible(false);
-                      }}
+                      onPress={() => handleOptionSelect(option)}
                     >
                       <Text style={styles.optionText}>{option}</Text>
                     </TouchableOpacity>
@@ -102,9 +165,13 @@ const Goal = () => {
               mode="contained"
               style={styles.button}
               onPress={nextQuestion}
-              disabled={!selectedOption}
+              disabled={!selectedOptions[currentQuestion]}
             >
-              <Text style={styles.buttonText}>Continue</Text>
+              <Text style={styles.buttonText}>
+                {currentQuestion === questions.length - 1
+                  ? "Generate Workouts"
+                  : "Continue"}
+              </Text>
             </Button>
           </View>
         </ImageBackground>
