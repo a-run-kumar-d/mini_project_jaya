@@ -1,3 +1,4 @@
+import { app } from "../firebaseConfig";
 import fit from "@/assets/images/img1.png";
 import { Link } from "expo-router";
 import {

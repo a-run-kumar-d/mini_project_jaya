@@ -1,0 +1,6 @@
+          "current_key": ""
+    "project_id": "",
+    "storage_bucket": ""
+        "mobilesdk_app_id": "",
+
+

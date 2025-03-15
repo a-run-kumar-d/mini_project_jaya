@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "391765619680",
+    "project_id": "fitnessapp-ba7ba",
+    "storage_bucket": "fitnessapp-ba7ba.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:391765619680:android:56b8dcfb53beefe3983185",
+        "android_client_info": {
+          "package_name": "com.jayavishnu.fitflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5PLT9Y7SKTR-hf29vAamtbLOgmJzAV5U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
