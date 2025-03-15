@@ -1,71 +1,54 @@
-import fit from "@/assets/images/img4.jpg";
-import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import "react-native-gesture-handler";
+import fit from "@/assets/images/img4.png";
+import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { ImageBackground, StyleSheet, Text, View } from "react-native";
+import { RadioButton } from "react-native-paper";
 
-const RadioButton = ({ label, selected, onPress }) => {
-  return (
-    <TouchableOpacity style={styles.radioButtonContainer} onPress={onPress}>
-      {/*<View style={[styles.radioButton, selected && styles.radioButtonSelected]} />&*/}
-      <Text style={[styles.radioButtonLabel, selected ? styles.radioButtonLabelSelected : null]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-};
+const questions = [
+  {
+    id: 1,
+    question: "What is your primary goal?",
+    options: [
+      "Build Muscle Mass & Size",
+      "Lose Weight & Burn Fat",
+      "Increase Strength & Lift More Weight",
+      "Tone Up - Gain Muscle & Lose Fat",
+      "Get Fitter & Feel Healthy",
+      "Train For Tactical Readiness",
+    ],
+  },
+];
 
-const goal = () => {
+const Goal = () => {
   const navigation = useNavigation();
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
 
-  // Function to handle selection change
-  const handleSelectionChange = (option) => {
-    setSelectedOption(option);
+  const nextQuestion = () => {
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      navigation.navigate("hard");
+    }
   };
 
   return (
     <View style={styles.container}>
       <ImageBackground source={fit} resizeMode="cover" style={styles.image}>
-        <Text style={styles.title}>What is your primary goal?</Text>
-
-        <RadioButton
-           label="Build Muscle Mass & Size"
-           selected={selectedOption === '1'}
-           onPress={() => handleSelectionChange('1')}
-         />
-        <RadioButton
-          label="Lose Weight & Burn Fat"
-          selected={selectedOption === '2'}
-          onPress={() => handleSelectionChange('2')}
+        <Text style={styles.title}>{questions[currentQuestion].question}</Text>
+        {questions[currentQuestion].options.map((option, index) => (
+          <RadioButton.Item
+            key={index}
+            label={option}
+            status={selectedOption === option ? "checked" : "unchecked"}
+            onPress={() => setSelectedOption(option)}
+          />
+        ))}
+        <RadioButton.Item
+          label="Continue"
+          status={selectedOption ? "checked" : "unchecked"}
+          onPress={nextQuestion}
         />
-        <RadioButton
-          label="Increase Strength & Lift More Weight"
-          selected={selectedOption === '3'}
-          onPress={() => handleSelectionChange('3')}
-        />
-        <RadioButton
-          label="Tone Up - Gain Muscle & Lose Fat"
-          selected={selectedOption === '4'}
-          onPress={() => handleSelectionChange('4')}
-        />
-        <RadioButton
-          label="Get Fitter & Feel Healthy"
-          selected={selectedOption === '5'}
-          onPress={() => handleSelectionChange('5')}
-        />
-        <RadioButton
-          label="Train For Tactical Readliness"
-          selected={selectedOption === '6'}
-          onPress={() => handleSelectionChange('6')}
-        />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('hard')}
-          disabled={!selectedOption} // Disable button if no option is selected
-        >
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
       </ImageBackground>
     </View>
   );
@@ -74,74 +57,24 @@ const goal = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
-  title: {
-    position: 'absolute',
-    top: 12,
-    left: 0,
-    right: 0,
-    fontSize: 32,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    color: 'white',
-  },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
+    resizeMode: "cover",
+    justifyContent: "center",
   },
-  radioButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  radioButton: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: 'orange',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioButtonSelected: {
-    backgroundColor: 'orange',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  radioButtonLabel: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    color: 'white',
-    marginLeft: 10,
-    fontFamily: 'Roboto',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-  radioButtonLabelSelected: {
-    color: 'orange',
-  },
-  button: {
-    position: 'absolute',
-    bottom: 10,
-    backgroundColor: 'orange',
-    padding: 15,
-    borderRadius: 8,
-    width: '100%',
-    alignItems: 'center',
-    opacity: 0.7, // Make it semi-transparent when disabled
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 23,
+  title: {
+    fontSize: 32,
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 20,
   },
 });
 
-export default goal;
+export default Goal;

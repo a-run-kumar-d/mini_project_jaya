@@ -1,45 +1,139 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { FontAwesome5 } from "@expo/vector-icons";
+import { StyleSheet, Text, View } from "react-native";
+import { Tabs } from "expo-router";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+type TabIconsProps = {
+  icon: string;
+  color: string;
+  name: string;
+  focused: boolean;
+  main?: boolean;
+};
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+const TabIcons = (props: TabIconsProps) => {
+  if (props.main === true) {
+    return (
+      <View
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 60,
+          width: 60,
+          backgroundColor: "#fff",
+          gap: 5,
+          marginBottom: 50,
+          borderRadius: 50,
+        }}
+      >
+        <FontAwesome5 name={props.icon} size={25} color="#121215" />
+      </View>
+    );
+  } else {
+    return (
+      <View
+        style={{
+          marginTop: 15,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 5,
+        }}
+      >
+        <FontAwesome5
+          name={props.icon}
+          size={20}
+          color={props.color}
+          style={styles.icon}
+        />
+        <Text
+          style={{
+            fontSize: 12,
+            color: props.color,
+          }}
+        >
+          {props.name}
+        </Text>
+      </View>
+    );
+  }
+};
 
+const tabsLayout = () => {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+    <>
+      <Tabs
+        screenOptions={{
+          tabBarShowLabel: false,
+          tabBarActiveTintColor: "#fff",
+          tabBarInactiveTintColor: "#121215",
+          tabBarStyle: {
+            paddingHorizontal: 40,
+            display: "flex",
+            alignItems: "stretch",
+            backgroundColor: "#3E3E43",
+            height: 75,
+            paddingTop: 5,
+            borderColor: "#121215",
           },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: "Home",
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcons
+                icon="home"
+                color={color}
+                name="Home"
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="chat"
+          options={{
+            title: "Chat",
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcons
+                icon="qrcode"
+                color={color}
+                name=""
+                focused={focused}
+                main
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="dash"
+          options={{
+            title: "Dashboard",
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcons
+                icon="user"
+                color={color}
+                name="Dashboard"
+                focused={focused}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    </>
   );
-}
+};
+
+export default tabsLayout;
+
+const styles = StyleSheet.create({
+  icon: {
+    height: 20,
+    width: 20,
+  },
+});

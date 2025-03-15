@@ -1,155 +1,118 @@
-import fit from "@/assets/images/img4.jpg";
-import fit1 from "@/assets/images/img5.jpg";
-import fit2 from "@/assets/images/img6.jpg";
-import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import fit from "@/assets/images/img4.png";
+import { useNavigation } from "@react-navigation/native";
+import { FontAwesome } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import "react-native-gesture-handler";
-
-const RadioButton = (props) => {
-  // Destructure the props
-  const { label, isSelected, onSelectionChange } = props;
-
-  return (
-    // TouchableOpacity is used to handle the press event
-    <TouchableOpacity style={styles1.radioButtonContainer} onPress={onSelectionChange}>
-      <View style={styles1.radioButton}>
-        {/* Render a smaller circle inside the outer circle when isSelected is true */}
-        {isSelected ? <View style={styles1.radioButtonSelected} /> : null}
-      </View>
-      <Text style={styles1.radioButtonLabel}>{label}</Text>
-    </TouchableOpacity>
-  );
-};
-
-// Styles for the RadioButton component
-const styles1 = StyleSheet.create({
-  radioButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 5,
-  },
-  radioButton: {
-    height: 25,
-    width: 25,
-    borderRadius: 10,
-    borderWidth: 4,
-    borderColor: 'blue',
-    alignItems: 'center',
-    justifyContent: 'center',
-    //marginLeft: 25,
-  },
-  radioButtonSelected: {
-    width: 25,
-    height: 25,
-    borderRadius: 7,
-    //marginLeft: 10, 
-    backgroundColor: 'blue',
-  },
-  radioButtonLabel: {
-    fontSize: 30,          // Adjust text size for better readability
-    fontWeight: 'bold',    // Bold text
-    color: 'white',      // Dark gray for a modern look
-    //marginLeft: 10,        // Space between radio button and text
-    fontFamily: 'Roboto',  // Use a custom font if available
-    letterSpacing: 1,      // Slight spacing between letters
-    textTransform: 'uppercase', // Convert text to uppercase
-  },
-});
 
 const Gender = () => {
   const navigation = useNavigation();
-   // useState hook to manage the selected option
-   const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedGender, setSelectedGender] = useState(null);
 
-   // Function to handle selection change
-   const handleSelectionChange = (option) => {
-     setSelectedOption(option);
-   };
   return (
     <View style={styles.container}>
-      <ImageBackground source={fit} resizeMode="cover" style={styles.image1}>
-        <Text style={styles.title}>Gender</Text>
-        <View style={styles.radioGroup}>
-        <View style={styles.radio}>
-      <Image source={fit1} style={styles.image} />
-      <RadioButton 
-    label="MALE"
-    isSelected={selectedOption === 'male'}
-    onSelectionChange={() => handleSelectionChange('male')}
-  />
-    </View>
-    <View style={styles.radio}>
-    <Image source={fit2} style={styles.image} />
-  <RadioButton
-    label="FEMALE"
-    isSelected={selectedOption === 'female'}
-    onSelectionChange={() => handleSelectionChange('female')}
-  />
-</View>
-</View>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('bmi')}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
+      <ImageBackground source={fit} resizeMode="cover" style={styles.image}>
+        <View style={styles.wrapper}>
+          <Text style={styles.title}>Select Your Gender</Text>
+          <View style={styles.genderContainer}>
+            <TouchableOpacity
+              style={[
+                styles.genderButton,
+                selectedGender === "male" && styles.selectedButton,
+              ]}
+              onPress={() => setSelectedGender("male")}
+            >
+              <FontAwesome name="mars" size={60} color="white" />
+              <Text style={styles.genderText}>Male</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.genderButton,
+                selectedGender === "female" && styles.selectedButton,
+              ]}
+              onPress={() => setSelectedGender("female")}
+            >
+              <FontAwesome name="venus" size={60} color="white" />
+              <Text style={styles.genderText}>Female</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("bmi")}
+            disabled={!selectedGender}
+          >
+            <Text style={styles.buttonText}>Next</Text>
+          </TouchableOpacity>
+        </View>
       </ImageBackground>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { color: 'white', fontSize: 42, fontWeight: 'bold', textAlign: 'center', marginBottom: 100 },
-  input: {
-    width: '100%',
-    height: 50,
-    fontSize: 25,
-    fontWeight: 'bold',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    color: 'white',
+  container: {
+    flex: 1,
   },
-  image1: { width: '100%', height: '100%', flex: 1, resizeMode: 'cover', justifyContent: 'center' },
+  image: {
+    flex: 1,
+    width: "100%",
+    resizeMode: "cover",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  wrapper: {
+    width: "90%",
+    padding: 20,
+    alignItems: "center",
+    gap: 20,
+  },
+  title: {
+    color: "white",
+    fontSize: 32,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  genderContainer: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 15,
+  },
+  genderButton: {
+    width: "100%",
+    height: "50%",
+    paddingVertical: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "center",
+  },
+  selectedButton: {
+    backgroundColor: "#007BFF",
+  },
+  genderText: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "semibold",
+  },
   button: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#007BFF',
-    padding: 15,
-    borderRadius: 8,
-    width: '25%',
-    alignItems: 'center',
+    marginTop: 20,
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 40,
+    alignItems: "center",
+    width: "100%",
   },
-  radio:{
-    width: '50%',
-    padding: 7,
-    justifyContent: 'space-between',
+  buttonText: {
+    color: "#1A1A1A",
+    fontSize: 24,
+    fontWeight: "bold",
   },
-  image:{
-    width: 200,
-    borderRadius: 40,
-  },
-  label: { 
-  flex: 1,
-  position: 'absolute', 
-  flexDirection: 'row', 
-  alignItems: 'center',
-  fontWeight: 'bold', 
-  fontSize: 5,
-},
-radioGroup: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  width: '100%', // Adjust based on layout
-  marginBottom: 20,
-  fontSize: 25,
-  color: 'white',
-},
-  switchContainer: { position: 'absolute', flexDirection: 'row', alignItems: 'center', marginBottom: 20, right: 25 },
-  buttonText: { color: '#fff', fontSize: 18 },
 });
 
 export default Gender;
