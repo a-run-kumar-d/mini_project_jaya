@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-       "bundleIdentifier": "com.jayavishnu.fitflow"
+      "bundleIdentifier": "com.jayavishnu.fitflow"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,8 @@
         "backgroundColor": "#ffffff",
         "package": "com.jayavishnu.fitflow",
         "googleServicesFile": "./assets/google-services.json"
-      }
+      },
+      "package": "com.jayavishnu.fitflow"
     },
     "web": {
       "bundler": "metro",
@@ -39,6 +40,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "88633e6f-9ffb-47ad-81bf-27c575e86799"
+      }
     }
   }
 }
