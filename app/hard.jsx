@@ -64,7 +64,7 @@ const Hard = () => {
         </Text>
         <TouchableOpacity
           style={styles.nextButton}
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.navigate("index")}
         >
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>

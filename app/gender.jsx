@@ -10,10 +10,51 @@ import {
   View,
 } from "react-native";
 import "react-native-gesture-handler";
+import { getAuth } from "firebase/auth";
+import app from "@/firebaseConfig";
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  updateDoc,
+  where,
+  limit, // Added limit for efficiency
+} from "firebase/firestore";
 
 const Gender = () => {
   const navigation = useNavigation();
   const [selectedGender, setSelectedGender] = useState(null);
+  const updateGender = async () => {
+    try {
+      const auth = getAuth(app);
+      await auth.authStateReady(); // Wait for auth state to be ready
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        console.error("No authenticated user found.");
+        return;
+      }
+
+      const db = getFirestore(app);
+      const colRef = collection(db, "Users");
+      const q = query(colRef, where("userId", "==", userId), limit(1));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.error("User document not found in Firestore.");
+        return;
+      }
+
+      const docRef = doc(db, "Users", querySnapshot.docs[0].id);
+      await updateDoc(docRef, { gender: selectedGender });
+
+      console.log("Gender updated successfully.");
+      navigation.navigate("bmi");
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -43,8 +84,8 @@ const Gender = () => {
             </TouchableOpacity>
           </View>
           <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("bmi")}
+            style={[styles.button, !selectedGender && styles.disabledButton]}
+            onPress={updateGender}
             disabled={!selectedGender}
           >
             <Text style={styles.buttonText}>Next</Text>
@@ -87,10 +128,10 @@ const styles = StyleSheet.create({
   },
   genderButton: {
     width: "100%",
-    height: "50%",
     paddingVertical: 20,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     alignItems: "center",
+    borderRadius: 10,
   },
   selectedButton: {
     backgroundColor: "#007BFF",
@@ -98,7 +139,7 @@ const styles = StyleSheet.create({
   genderText: {
     color: "white",
     fontSize: 24,
-    fontWeight: "semibold",
+    fontWeight: "600",
   },
   button: {
     marginTop: 20,
@@ -107,6 +148,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     alignItems: "center",
     width: "100%",
+    borderRadius: 10,
+  },
+  disabledButton: {
+    backgroundColor: "gray",
   },
   buttonText: {
     color: "#1A1A1A",

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import fit from "@/assets/images/Frame.png";
+import { router } from "expo-router";
 
 import {
   StyleSheet,
@@ -14,6 +15,17 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Card, FAB } from "react-native-paper";
 import { PieChart } from "react-native-chart-kit";
+import { getAuth, signOut } from "firebase/auth";
+import app from "@/firebaseConfig";
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+  updateDoc,
+} from "firebase/firestore";
 
 const Home = () => {
   const [userName, setUserName] = useState("Arunkumar D");
@@ -23,14 +35,31 @@ const Home = () => {
   const [hasWorkoutPlan, setHasWorkoutPlan] = useState(false);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
-      setUserName(user.name);
-      setUserHeight(user.height);
-      setUserWeight(user.weight);
-      setBmiStatus(user.bmiStatus);
-      setHasWorkoutPlan(!!user.workoutPlan);
-    }
+    const fetchUserData = async () => {
+      try {
+        const auth = getAuth(app);
+        const userId = auth.currentUser?.uid;
+        if (userId) {
+          const db = getFirestore(app);
+          const colref = collection(db, "Users");
+          const q = query(colref, where("userId", "==", userId));
+          const querySnapshot = await getDocs(q);
+
+          if (!querySnapshot.empty) {
+            const data = querySnapshot.docs[0].data();
+            setUserName(data.name);
+            setUserHeight(data.height);
+            setUserWeight(data.weight);
+            setBmiStatus(data.BMIstatus);
+            setHasWorkoutPlan(data.hasWorkoutPlan);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const handleGenerateWorkoutPlan = () => {
@@ -39,8 +68,23 @@ const Home = () => {
 
   const navigation = useNavigation();
 
+  const handleLogout = () => {
+    const auth = getAuth(app);
+    signOut(auth)
+      .then(() => {
+        console.log("login out");
+        router.replace("/");
+      })
+      .catch((error) => {
+        console.log("Some error happened", error);
+      });
+  };
+
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Log Out</Text>
+      </TouchableOpacity>
       <ImageBackground
         source={fit}
         resizeMode="cover"
@@ -101,6 +145,19 @@ const styles = StyleSheet.create({
     paddingTop: 75,
     flex: 1,
     backgroundColor: "#111214",
+  },
+  logoutButton: {
+    position: "absolute",
+    zIndex: 1,
+    top: 20,
+    right: 20,
+    backgroundColor: "#F97316",
+    borderRadius: 10,
+    padding: 10,
+  },
+  logoutButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   welcomeSection: {
     padding: 20,
@@ -176,12 +233,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
-  },
-  ctaButton: {
-    backgroundColor: "#F97316",
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 10,
   },
   ctaButton2: {
     backgroundColor: "#393C43",

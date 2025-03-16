@@ -8,32 +8,89 @@ import {
   Dimensions,
 } from "react-native";
 import { Circle, Line, Path, Svg } from "react-native-svg";
+import { getAuth } from "firebase/auth";
+import app from "@/firebaseConfig";
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+  updateDoc,
+} from "firebase/firestore";
 
 const { width } = Dimensions.get("window");
 
 const Bmi = () => {
   const navigation = useNavigation();
-
-  const height = 171; // in cm
-  const weight = 80; // in kg
-
+  const [height, setHeight] = useState(0);
+  const [weight, setWeight] = useState(0);
   const [bmi, setBmi] = useState(null);
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    calculateBMI();
+    const fetchUserData = async () => {
+      try {
+        const auth = getAuth(app);
+        const userId = auth.currentUser?.uid;
+        if (userId) {
+          const db = getFirestore(app);
+          const colref = collection(db, "Users");
+          const q = query(colref, where("userId", "==", userId));
+          const querySnapshot = await getDocs(q);
+
+          if (!querySnapshot.empty) {
+            const data = querySnapshot.docs[0].data();
+            setHeight(data.height);
+            setWeight(data.weight);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
-  const calculateBMI = () => {
+  useEffect(() => {
+    if (height && weight) {
+      calculateBMI();
+    }
+  }, [height, weight]);
+
+  const calculateBMI = async () => {
     const h = height / 100;
     const w = weight;
     const bmiValue = (w / (h * h)).toFixed(2);
     setBmi(parseFloat(bmiValue));
 
-    if (bmiValue < 18.5) setStatus("Underweight");
-    else if (bmiValue < 25) setStatus("Normal");
-    else if (bmiValue < 30) setStatus("Overweight");
-    else setStatus("Obese");
+    let bmiStatus = "";
+    if (bmiValue < 18.5) bmiStatus = "Underweight";
+    else if (bmiValue < 25) bmiStatus = "Normal";
+    else if (bmiValue < 30) bmiStatus = "Overweight";
+    else bmiStatus = "Obese";
+
+    setStatus(bmiStatus);
+
+    try {
+      const auth = getAuth(app);
+      const userId = auth.currentUser?.uid;
+      if (userId) {
+        const db = getFirestore(app);
+        const colref = collection(db, "Users");
+        const q = query(colref, where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const docRef = doc(db, "Users", querySnapshot.docs[0].id);
+          await updateDoc(docRef, { BMIstatus: bmiStatus });
+        }
+      }
+    } catch (error) {
+      console.error("Error updating BMI status: ", error);
+    }
   };
 
   const minBMI = 10,
@@ -89,7 +146,7 @@ const Bmi = () => {
             <Circle cx="100" cy="100" r="5" fill="#D7D8D9" />
           </Svg>
         </View>
-        <Text style={styles.selectedText}>{bmi}</Text>
+        <Text style={styles.selectedText}>{bmi ?? "--"}</Text>
         <Text style={styles.statusText}>[ {status} ]</Text>
         <Text style={styles.description}>
           Your BMI is calculated based on height and weight. Keep tracking to

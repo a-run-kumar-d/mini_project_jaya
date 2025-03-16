@@ -1,6 +1,5 @@
-import { app } from "../firebaseConfig";
 import fit from "@/assets/images/img1.png";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import {
   ImageBackground,
   StyleSheet,
@@ -9,8 +8,31 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import app from "@/firebaseConfig";
+import { useEffect, useState } from "react";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
 
 const App = () => {
+  useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.replace("/home"); // Redirect to home for all logged-in users
+      } else {
+        console.log("No user logged in."); // End loading when no user is logged in
+      }
+    });
+
+    return () => unsubscribe(); // Clean up the subscription on unmount
+  }, [router]);
+
   return (
     <View style={styles.container}>
       <ImageBackground source={fit} resizeMode="cover" style={styles.image}>

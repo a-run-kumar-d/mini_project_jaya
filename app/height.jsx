@@ -10,33 +10,71 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import "react-native-gesture-handler";
+import { getAuth } from "firebase/auth";
+import app from "@/firebaseConfig";
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  updateDoc,
+  where,
+  limit, // Added limit for efficiency
+} from "firebase/firestore";
 
 const Height = () => {
+  const navigation = useNavigation();
   const [isMetric, setIsMetric] = useState(true);
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-  const navigation = useNavigation();
 
-  // Convert height & weight based on unit system
-  const convertHeight = (value, isMetric) => {
-    if (!value) return ""; // Handle empty input
-    return isMetric ? value : (parseFloat(value) * 0.393701).toFixed(2); // cm to inches
-  };
+  const convertHeight = (value, isMetric) =>
+    !value ? "" : isMetric ? value : (parseFloat(value) * 0.393701).toFixed(2);
 
-  const convertWeight = (value, isMetric) => {
-    if (!value) return ""; // Handle empty input
-    return isMetric ? value : (parseFloat(value) * 2.20462).toFixed(2); // kg to lbs
-  };
+  const convertWeight = (value, isMetric) =>
+    !value ? "" : isMetric ? value : (parseFloat(value) * 2.20462).toFixed(2);
 
-  const handleHeightChange = (value) => {
-    if (!value) return setHeight("");
-    setHeight(isMetric ? value : (parseFloat(value) / 0.393701).toFixed(2)); // Inches to cm
-  };
+  const handleHeightChange = (value) =>
+    setHeight(
+      !value ? "" : isMetric ? value : (parseFloat(value) / 0.393701).toFixed(2)
+    );
 
-  const handleWeightChange = (value) => {
-    if (!value) return setWeight("");
-    setWeight(isMetric ? value : (parseFloat(value) / 2.20462).toFixed(2)); // lbs to kg
+  const handleWeightChange = (value) =>
+    setWeight(
+      !value ? "" : isMetric ? value : (parseFloat(value) / 2.20462).toFixed(2)
+    );
+
+  const updateHeightAndWeight = async () => {
+    try {
+      const auth = getAuth(app);
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        console.error("No authenticated user found.");
+        return;
+      }
+
+      const db = getFirestore(app);
+      const colRef = collection(db, "Users");
+      const q = query(colRef, where("userId", "==", userId), limit(1)); // Added limit(1) to improve efficiency
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.error("User document not found in Firestore.");
+        return;
+      }
+
+      const docRef = doc(db, "Users", querySnapshot.docs[0].id);
+      await updateDoc(docRef, {
+        height: convertHeight(height, isMetric),
+        weight: convertWeight(weight, isMetric),
+      });
+
+      console.log("User height and weight updated successfully in Firestore.");
+      navigation.navigate("gender");
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
   };
 
   return (
@@ -45,7 +83,6 @@ const Height = () => {
         <View style={styles.wrapper}>
           <Text style={styles.title}>Enter Your Details</Text>
 
-          {/* Unit Toggle Switch */}
           <View style={styles.switchContainer}>
             <Text style={styles.label}>lb/in</Text>
             <Switch
@@ -57,7 +94,6 @@ const Height = () => {
             <Text style={styles.label}>kg/cm</Text>
           </View>
 
-          {/* Height Input */}
           <TextInput
             style={styles.input}
             placeholder={isMetric ? "Enter height (cm)" : "Enter height (in)"}
@@ -67,7 +103,6 @@ const Height = () => {
             onChangeText={setHeight}
           />
 
-          {/* Weight Input */}
           <TextInput
             style={styles.input}
             placeholder={isMetric ? "Enter weight (kg)" : "Enter weight (lb)"}
@@ -77,12 +112,11 @@ const Height = () => {
             onChangeText={setWeight}
           />
 
-          {/* Next Button */}
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("gender")}
+            onPress={updateHeightAndWeight}
           >
-            <Text style={styles.buttonText}>Next</Text>
+            <Text style={styles.buttonText}>Continue</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
@@ -104,7 +138,7 @@ const styles = StyleSheet.create({
   wrapper: {
     width: "90%",
     padding: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.8)", // Dark overlay for readability
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
     alignItems: "center",
     gap: 10,
   },
@@ -131,7 +165,7 @@ const styles = StyleSheet.create({
     height: 60,
     fontSize: 18,
     paddingHorizontal: 15,
-    backgroundColor: "rgba(255, 255, 255, 0.2)", // Semi-transparent input field
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     color: "white",
     marginBottom: 15,
   },

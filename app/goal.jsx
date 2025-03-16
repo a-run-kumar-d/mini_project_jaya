@@ -15,73 +15,73 @@ const questions = [
   {
     id: 1,
     question: "Which body part are you focusing on?",
-    options: [
-      "Chest",
-      "Back",
-      "Legs",
-      "Arms",
-      "Core",
-      "Shoulders",
-      "Neck",
-      "Cardio",
-      "Waist",
-    ],
+    options: ["Upper", "Lower", "Back", "Cardio", "Core"],
   },
   {
     id: 2,
     question: "Which equipment are you using?",
     options: [
-      "Dumbbells",
-      "Barbell",
-      "Resistance Bands",
-      "Bodyweight",
-      "Kettlebells",
-      "Machines",
       "Cardio Machines",
-      "Specialty Equipment",
+      "Bars & Weights",
+      "Strength Equipment",
+      "Functional Training Tools",
+      "Resistance & Bodyweight",
     ],
   },
   {
     id: 3,
     question: "What intensity or preparation level?",
-    options: [
-      "Stretching",
-      "Warm-up Cardio",
-      "Foam Rolling",
-      "No Additional Prep",
-      "High Intensity",
-      "Moderate Effort",
-      "Light Activity",
-    ],
+    options: ["High Intensity", "Moderate Effort", "Light Activity"],
   },
 ];
 
 const equipmentGroups = {
-  Machines: [
-    "Smith Machine",
-    "Sled Machine",
-    "Leverage Machine",
-    "Cable",
-    "Assisted",
+  "Cardio Machines": [
+    "stepmill machine",
+    "stationary bike",
+    "elliptical machine",
+    "skierg machine",
+    "upper body ergometer",
   ],
-  CardioMachines: [
-    "Treadmill",
-    "Bike",
-    "Elliptical",
-    "Skierg Machine",
-    "Upper Body Ergometer (UBE)",
+  "Bars & Weights": [
+    "trap bar",
+    "olympic barbell",
+    "ez barbell",
+    "barbell",
+    "weighted",
   ],
-  SpecialtyEquipment: [
-    "Trap Bar",
-    "Bosu Ball",
-    "Medicine Ball",
-    "Rope",
-    "Hammer",
-    "Tire",
-    "Roller",
+  "Strength Equipment": [
+    "smith machine",
+    "sled machine",
+    "dumbbell",
+    "kettlebell",
+    "medicine ball",
+  ],
+  "Functional Training Tools": [
+    "tire",
+    "roller",
+    "wheel roller",
+    "hammer",
+    "bosu ball",
+    "stability ball",
+  ],
+  "Resistance & Bodyweight": [
+    "resistance band",
+    "rope",
+    "band",
+    "assisted",
+    "body weight",
+    "cable",
+    "leverage machine",
   ],
 };
-
+const muscleGroups = {
+  Upper: ["shoulders", "upper arms", "chest"],
+  Lower: ["lower arms", "upper legs", "lower legs", "waist"],
+  Back: ["back"],
+  Cardio: ["cardio"],
+  Core: ["neck"],
+};
 const Goal = () => {
   const navigation = useNavigation();
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -103,22 +103,52 @@ const Goal = () => {
     }
   };
 
-  const generateWorkout = () => {
+  const generateWorkout = async () => {
     console.log("Selected Values:", selectedOptions);
+    const [allowedEquipment, allowedMuscle] = [
+      equipmentGroups[selectedOptions[1]],
+      muscleGroups[selectedOptions[0]],
+    ];
+    const exerciseCount =
+      selectedOptions[2] === "High Intensity"
+        ? 7
+        : selectedOptions[2] === "Moderate Effort"
+        ? 5
+        : 3;
+    console.log(allowedEquipment, allowedMuscle, exerciseCount);
 
-    const selectedEquipment = selectedOptions[1]; // Equipment selection
+    try {
+      let exercises = [];
+      for (let i = 0; i < allowedMuscle.length; i++) {
+        const response = await fetch(
+          `https://exercisedb-api.vercel.app/api/v1/bodyparts/${allowedMuscle[i]}/exercises`
+        );
+        const data = await response.json();
+        exercises = [...exercises, ...data.data.exercises];
 
-    if (selectedEquipment === "Machines") {
-      console.log("Machines:", equipmentGroups.Machines);
-    }
-    if (selectedEquipment === "Cardio Machines") {
-      console.log("Cardio Machines:", equipmentGroups.CardioMachines);
-    }
-    if (selectedEquipment === "Specialty Equipment") {
-      console.log("Specialty Equipment:", equipmentGroups.SpecialtyEquipment);
+        if (exerciseCount === 3) break;
+      }
+
+      if (exerciseCount > 3 && allowedMuscle.length === 1) {
+        const nextPageResponse = await fetch(
+          `https://exercisedb-api.vercel.app/api/v1/bodyparts/${allowedMuscle[0]}/exercises?page=2`
+        );
+        const nextPageData = await nextPageResponse.json();
+        exercises = [...exercises, ...nextPageData.data.exercises];
+      }
+
+      const filteredExercises = exercises
+        .filter((exercise) =>
+          exercise.equipments.some((equip) => allowedEquipment.includes(equip))
+        )
+        .slice(0, exerciseCount);
+
+      console.log(filteredExercises);
+    } catch (error) {
+      console.error(error);
     }
 
-    navigation.navigate("hard");
+    // navigation.navigate("hard");
   };
 
   return (
