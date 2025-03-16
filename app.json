@@ -15,9 +15,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff",
-        "package": "com.jayavishnu.fitflow",
-        "googleServicesFile": "./assets/google-services.json"
+        "backgroundColor": "#ffffff"
       },
       "package": "com.jayavishnu.fitflow"
     },
@@ -35,6 +33,14 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.25"
+          }
         }
       ]
     ],
