@@ -192,13 +192,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.2)", // Semi-transparent input field
     color: "white",
     marginBottom: 15,
+    borderRadius: 15,
   },
   button: {
     marginTop: 10,
-    backgroundColor: "#007BFF",
+    backgroundColor: "#F97316",
     paddingVertical: 20,
     paddingHorizontal: 40,
     alignItems: "center",
+    borderRadius: 15,
     width: "100%",
   },
   buttonText: {

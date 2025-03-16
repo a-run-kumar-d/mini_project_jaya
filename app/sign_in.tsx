@@ -30,9 +30,9 @@ const SignIn = () => {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.title}>Welcome Back</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input]}
         placeholder="Email"
         keyboardType="email-address"
         value={email}
@@ -58,31 +58,38 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+    backgroundColor: "#111214",
   },
   title: {
-    fontSize: 24,
+    color: "white",
+    fontSize: 32,
     fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 20,
   },
   input: {
     width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    height: 60,
+    fontSize: 18,
+    paddingHorizontal: 15,
+    backgroundColor: "rgba(255, 255, 255, 0.2)", // Semi-transparent input field
+    color: "white",
     marginBottom: 15,
+    borderRadius: 15,
   },
   button: {
-    backgroundColor: "#007BFF",
-    padding: 15,
-    borderRadius: 8,
-    width: "100%",
+    marginTop: 10,
+    backgroundColor: "#F97316",
+    paddingVertical: 20,
+    paddingHorizontal: 40,
     alignItems: "center",
+    borderRadius: 15,
+    width: "100%",
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });
 

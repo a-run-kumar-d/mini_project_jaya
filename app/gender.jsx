@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   selectedButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#F97316",
   },
   genderText: {
     color: "white",

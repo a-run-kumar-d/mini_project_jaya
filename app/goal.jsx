@@ -233,6 +233,7 @@ const Goal = () => {
                     </TouchableOpacity>
                   ))}
                   <Button
+                    style={styles.closeButton}
                     mode="contained"
                     onPress={() => setModalVisible(false)}
                   >
@@ -304,6 +305,9 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#F97316",
     borderRadius: 8,
+  },
+  closeButton: {
+    backgroundColor: "#F97316",
   },
   buttonText: {
     color: "#FFF",

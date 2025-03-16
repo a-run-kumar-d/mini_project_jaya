@@ -76,6 +76,7 @@ const Chat = () => {
         value={input}
         onChangeText={setInput}
         placeholder="Type a message..."
+        placeholderTextColor={"#fff"}
       />
 
       <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
@@ -86,12 +87,12 @@ const Chat = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 10, backgroundColor: "#f4f4f4" },
+  container: { flex: 1, padding: 10, backgroundColor: "#111214" },
   chatBox: { flex: 1, marginBottom: 10 },
   userText: {
     alignSelf: "flex-end",
-    backgroundColor: "#007AFF",
-    color: "#fff",
+    backgroundColor: "#fff",
+    color: "#111214",
     padding: 8,
     borderRadius: 5,
     marginVertical: 2,
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
   botText: {
     alignSelf: "flex-start",
     backgroundColor: "#e5e5ea",
-    color: "#000",
+    color: "#111214",
     padding: 8,
     borderRadius: 5,
     marginVertical: 2,
@@ -113,10 +114,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   sendButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 5,
+    backgroundColor: "#F97316",
+    borderRadius: 15,
     padding: 10,
     alignItems: "center",
+    marginBottom: 25,
   },
   sendButtonText: {
     color: "#fff",

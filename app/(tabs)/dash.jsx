@@ -28,7 +28,8 @@ const Dash = () => {
   const [previousWorkoutDetails, setPreviousWorkoutDetails] = useState([]);
   const [expandedExerciseId, setExpandedExerciseId] = useState(null); // Track the ID of the expanded exercise
   const [loading, setLoading] = useState(false);
-  const [fetchingDetails, setFetchingDetails] = useState(false);
+  const [timerAction, setTimerAction] = useState(false);
+  const [timer, setTimer] = useState(60);
   const [gif, setGif] = useState(null);
 
   const navigation = useNavigation();
@@ -96,6 +97,33 @@ const Dash = () => {
     fetchWorkouts();
   }, []);
 
+  // const getImageUrl = async (gifUrl) => {
+  //   try {
+  //     const response = await fetch(gifUrl);
+  //     const blob = await response.blob();
+  //     const imageUrl = URL.createObjectURL(blob);
+  //     return imageUrl;
+  //   } catch (error) {
+  //     console.error("Error fetching image:", error);
+  //   }
+  const startTimer = () => {
+    setTimerAction(true);
+    const interval = setInterval(() => {
+      setTimer((prevTimer) => {
+        if (prevTimer === 0) {
+          closeTimer();
+          return 0;
+        }
+        return prevTimer - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  };
+  const closeTimer = () => {
+    setTimerAction(false);
+    setTimer(60);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -125,6 +153,11 @@ const Dash = () => {
       </View>
 
       <ScrollView style={styles.scrollContainer}>
+        {timerAction && (
+          <View style={styles.timerContainer}>
+            <Text style={styles.timerText}>{timer} secs remaining</Text>
+          </View>
+        )}
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#fff" />
@@ -145,16 +178,51 @@ const Dash = () => {
             >
               <Card style={styles.card}>
                 <Card.Content>
+                  {/* {expandedExerciseId === item.exerciseId && (
+                    <>
+                      {item.gifUrl && (
+                        <Image
+                          source={{ uri: item.gifUrl }}
+                          style={styles.gif}
+                        />
+                      )}
+                    </>
+                  )} */}
                   <Text style={styles.workoutName}>{item.name}</Text>
                   {expandedExerciseId === item.exerciseId && (
                     <>
                       <Text style={styles.exerciseText}>
-                        Muscles: {item.targetMuscles.join(", ")}
+                        <Text style={styles.subText}>Muscles</Text>
+                        {"   "}
+                        {item.targetMuscles.join(", ")}
                       </Text>
                       <Text style={styles.exerciseText}>
-                        Equipment: {item.equipments.join(", ")}
+                        <Text style={styles.subText}>Equipment</Text>
+                        {"   "}
+                        {item.equipments.join(", ")}
                       </Text>
-                      <Button title="Start" onPress={() => {}} />
+                      <Text style={styles.intructionList}>
+                        Intructions <br></br>
+                        {item.instructions.map((instruction, index) => (
+                          <Text style={styles.subText} key={index}>
+                            {instruction}
+                            <br></br>
+                            <br></br>
+                          </Text>
+                        ))}
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.startButton}
+                        onPress={() => {
+                          if (!timerAction) {
+                            startTimer();
+                          } else {
+                            closeTimer();
+                          }
+                        }}
+                      >
+                        <Text style={styles.exerciseText}>Start</Text>
+                      </TouchableOpacity>
                     </>
                   )}
                 </Card.Content>
@@ -241,14 +309,27 @@ const styles = StyleSheet.create({
   },
   workoutName: {
     color: "#fff",
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     marginBottom: 8,
   },
   exerciseText: {
-    color: "#D7D8D9",
-    fontSize: 16,
+    color: "#fff",
+    fontSize: 18,
     marginBottom: 5,
+    fontWeight: "bold",
+  },
+  intructionList: {
+    color: "#fff",
+    fontSize: 18,
+    marginBottom: 5,
+    fontWeight: "bold",
+  },
+  subText: {
+    color: "#D7D8D9",
+    fontSize: 14,
+    marginBottom: 5,
+    fontWeight: "normal",
   },
   workoutDate: {
     color: "#fff",
@@ -256,8 +337,25 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 8,
   },
+  startButton: {
+    backgroundColor: "#F97316",
+    height: 64,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   scrollContainer: {
     flex: 1, // Ensure the scroll container takes up remaining space
+  },
+  timerContainer: {
+    alignItems: "center",
+    padding: 20,
+  },
+  timerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
   },
 });
 
