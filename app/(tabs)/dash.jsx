@@ -1,111 +1,118 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import React, { useEffect, useState, useCallback } from "react";
 import {
+  ActivityIndicator,
   Button,
-  Dimensions,
-  FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Image,
+  ScrollView,
 } from "react-native";
-import { PieChart } from "react-native-chart-kit";
-import { Card, FAB } from "react-native-paper";
-
-const screenWidth = Dimensions.get("window").width;
-const workouts = [
-  {
-    id: "1",
-    name: "Push-ups",
-    duration: 30,
-    image: require("../../assets/images/img1.png"),
-  },
-  {
-    id: "2",
-    name: "Squats",
-    duration: 45,
-    image: require("../../assets/images/img2.png"),
-  },
-  {
-    id: "3",
-    name: "Jumping Jacks",
-    duration: 60,
-    image: require("../../assets/images/img4.png"),
-  },
-  {
-    id: "4",
-    name: "Plank",
-    duration: 40,
-    image: require("../../assets/images/img4.png"),
-  },
-];
-const dailyData = [
-  { id: "1", label: "Steps", value: 85, goal: 100 },
-  { id: "2", label: "Calories Burned", value: 550, goal: 700 },
-  { id: "3", label: "Water Intake", value: 2.5, goal: 3 },
-  { id: "4", label: "Sleep", value: 6.5, goal: 8 },
-];
-
-const monthlyData = [
-  { id: "1", label: "Steps", value: 255000, goal: 300000 },
-  { id: "2", label: "Calories Burned", value: 16500, goal: 21000 },
-  { id: "3", label: "Water Intake", value: 75, goal: 90 },
-  { id: "4", label: "Sleep", value: 195, goal: 240 },
-];
+import { Card } from "react-native-paper";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const Dash = () => {
-  const [selectedTab, setSelectedTab] = useState("daily");
-  const [activeWorkout, setActiveWorkout] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [completedWorkouts, setCompletedWorkouts] = useState([]);
+  const [selectedTab, setSelectedTab] = useState("today");
+  const [todayWorkouts, setTodayWorkouts] = useState([]);
+  const [todayWorkoutDetails, setTodayWorkoutDetails] = useState([]);
+  const [previousWorkouts, setPreviousWorkouts] = useState([]);
+  const [previousWorkoutDetails, setPreviousWorkoutDetails] = useState([]);
+  const [expandedExerciseId, setExpandedExerciseId] = useState(null); // Track the ID of the expanded exercise
+  const [loading, setLoading] = useState(false);
+  const [fetchingDetails, setFetchingDetails] = useState(false);
+  const [gif, setGif] = useState(null);
+
   const navigation = useNavigation();
+  const auth = getAuth();
+  const db = getFirestore();
 
   useEffect(() => {
-    if (!activeWorkout || timeLeft <= 0 || isPaused) {
-      if (timeLeft === 0 && activeWorkout) {
-        setCompletedWorkouts((prev) => [...prev, activeWorkout.id]);
-        setActiveWorkout(null);
+    const fetchWorkouts = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          setLoading(true); // Set loading to true before fetching data
+
+          const usersCollection = collection(db, "Users");
+          const q = query(usersCollection, where("userId", "==", user.uid));
+          const querySnapshot = await getDocs(q);
+
+          if (querySnapshot.empty) {
+            setLoading(false); // Set loading to false if no user found
+            return;
+          }
+
+          const userDoc = querySnapshot.docs[0];
+          const workoutsCollection = collection(userDoc.ref, "Workouts");
+          const workoutsSnapshot = await getDocs(workoutsCollection);
+
+          const workouts = workoutsSnapshot.docs
+            .map((doc) => ({ id: doc.id, ...doc.data() }))
+            .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+
+          if (workouts.length) {
+            const todayExercises = workouts[0].exercises || [];
+            setTodayWorkouts(todayExercises);
+            setPreviousWorkouts(workouts.slice(1, 6));
+
+            // Fetch workout details concurrently using Promise.all
+            const workoutDetailsPromises = todayExercises.map(async (id) => {
+              const response = await fetch(
+                `https://exercisedb-api.vercel.app/api/v1/exercises/${id}`
+              );
+              const data = await response.json();
+              return data; // Return the entire data object
+            });
+
+            const workoutDetails = await Promise.all(workoutDetailsPromises);
+
+            // Extract the data.data part after all promises are resolved
+            const extractedWorkoutDetails = workoutDetails.map(
+              (item) => item.data
+            );
+            setTodayWorkoutDetails(extractedWorkoutDetails);
+
+            console.log(todayExercises, workouts.slice(1, 6));
+          }
+          setLoading(false); // Set loading to false after all data is fetched and processed
+        } else {
+          setLoading(false); // Set loading to false if no user is logged in
+        }
+      } catch (error) {
+        console.error("Error fetching workouts:", error);
+        setLoading(false); // Set loading to false in case of an error
       }
-      return;
-    }
+    };
 
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [activeWorkout, timeLeft, isPaused]);
-
-  const startWorkout = (workout) => {
-    setActiveWorkout(workout);
-    setTimeLeft(workout.duration);
-    setIsPaused(false);
-  };
-
-  const pauseResumeWorkout = () => {
-    setIsPaused(!isPaused);
-  };
+    fetchWorkouts();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>Dashboard</Text>
         <View style={styles.tabContainer}>
-          {["Workout", "Daily", "Monthly"].map((tab) => (
+          {["Today", "Previous"].map((tab) => (
             <TouchableOpacity
               key={tab}
               style={[
                 styles.tab,
-                selectedTab.toLowerCase() === tab.toLowerCase() &&
-                  styles.activeTab,
+                selectedTab === tab.toLowerCase() && styles.activeTab,
               ]}
               onPress={() => setSelectedTab(tab.toLowerCase())}
             >
               <Text
                 style={
-                  selectedTab.toLowerCase() === tab.toLowerCase()
+                  selectedTab === tab.toLowerCase()
                     ? styles.activeTabText
                     : styles.tabText
                 }
@@ -117,101 +124,58 @@ const Dash = () => {
         </View>
       </View>
 
-      {selectedTab === "workout" ? (
-        <FlatList
-          style={styles.workoutList}
-          data={workouts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Card style={styles.card}>
-              <Card.Content>
-                <View style={styles.workoutContainer}>
-                  <Image source={item.image} style={styles.workoutImage} />
-                  <View style={styles.workoutSubContainer}>
-                    <Text style={styles.workoutName}>{item.name}</Text>
-                    <Text style={styles.tabText}>
-                      ({item.duration} seconds)
-                    </Text>
-                    <View style={styles.workoutControlContainer}>
-                      {completedWorkouts.includes(item.id) ? (
-                        <Text style={styles.completedText}>Completed</Text>
-                      ) : (
-                        <View style={styles.workoutControl}>
-                          {activeWorkout?.id === item.id ? (
-                            <Text style={styles.timerText}>
-                              {`Time left: ${timeLeft}s`}
-                            </Text>
-                          ) : (
-                            <Button
-                              title="Start"
-                              onPress={() => startWorkout(item)}
-                            />
-                          )}
-                          {activeWorkout?.id === item.id && (
-                            <Button
-                              title={isPaused ? "Resume" : "Pause"}
-                              onPress={pauseResumeWorkout}
-                            />
-                          )}
-                        </View>
-                      )}
-                      <Button
-                        title="Details"
-                        style={styles.dButton}
-                        onPress={() =>
-                          navigation.navigate("WorkoutDetails", item)
-                        }
-                      />
-                    </View>
-                  </View>
-                </View>
-              </Card.Content>
-            </Card>
-          )}
-        />
-      ) : (
-        <FlatList
-          data={selectedTab === "daily" ? dailyData : monthlyData}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Card style={styles.card}>
-              <Card.Content>
-                <Text style={styles.label}>{item.label}</Text>
-                <PieChart
-                  data={[
-                    {
-                      name: "Completed",
-                      population: item.value,
-                      color: "#4CAF50",
-                      legendFontColor: "#fff",
-                      legendFontSize: 12,
-                    },
-                    {
-                      name: "Remaining",
-                      population: item.goal - item.value,
-                      color: "#D3D3D3",
-                      legendFontColor: "#fff",
-                      legendFontSize: 12,
-                    },
-                  ]}
-                  width={screenWidth - 60}
-                  height={150}
-                  chartConfig={{
-                    backgroundGradientFrom: "#1E1E1E",
-                    backgroundGradientTo: "#1E1E1E",
-                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                    strokeWidth: 2,
-                  }}
-                  accessor="population"
-                  backgroundColor="transparent"
-                  paddingLeft="15"
-                  absolute
-                />
-              </Card.Content>
-            </Card>
-          )}
-        />
-      )}
+      <ScrollView style={styles.scrollContainer}>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#fff" />
+            <Text style={styles.loadingText}>Loading workouts...</Text>
+          </View>
+        ) : selectedTab === "today" ? (
+          todayWorkoutDetails.map((item, index) => (
+            <TouchableOpacity
+              key={item.exerciseId}
+              onPress={() => {
+                setExpandedExerciseId(
+                  expandedExerciseId === item.exerciseId
+                    ? null
+                    : item.exerciseId
+                );
+                setGif(item.gifUrl);
+              }}
+            >
+              <Card style={styles.card}>
+                <Card.Content>
+                  <Text style={styles.workoutName}>{item.name}</Text>
+                  {expandedExerciseId === item.exerciseId && (
+                    <>
+                      <Text style={styles.exerciseText}>
+                        Muscles: {item.targetMuscles.join(", ")}
+                      </Text>
+                      <Text style={styles.exerciseText}>
+                        Equipment: {item.equipments.join(", ")}
+                      </Text>
+                      <Button title="Start" onPress={() => {}} />
+                    </>
+                  )}
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
+          ))
+        ) : (
+          previousWorkoutDetails.map((item, index) => (
+            <TouchableOpacity key={index}>
+              <Card style={styles.card}>
+                <Card.Content>
+                  <Text style={styles.workoutDate}>{item.timestamp}</Text>
+                  {item.exercises.map((exercise, exerciseIndex) => (
+                    <Text key={exerciseIndex}>{exercise}</Text>
+                  ))}
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -258,47 +222,43 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     elevation: 3,
   },
-  workoutContainer: {
-    flex: 1,
-    flexDirection: "row",
+  loadingContainer: {
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    marginVertical: 10,
   },
-  workoutSubContainer: {
-    flex: 1,
-    paddingLeft: 30,
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 5,
+  loadingText: {
+    color: "#fff",
+    marginTop: 10,
+    fontSize: 16,
   },
-  workoutImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 15,
-    marginBottom: 10,
+  exerciseImage: {
+    alignSelf: "center",
+    width: 200,
+    height: 200,
+    borderRadius: 20,
+    overflow: "hidden",
   },
   workoutName: {
-    fontSize: 18,
-    fontWeight: "bold",
     color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
   },
-  workoutControlContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+  exerciseText: {
+    color: "#D7D8D9",
+    fontSize: 16,
+    marginBottom: 5,
   },
-  workoutControl: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
+  workoutDate: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 8,
   },
-  dButton: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+  scrollContainer: {
+    flex: 1, // Ensure the scroll container takes up remaining space
   },
-  completedText: { fontSize: 16, fontWeight: "bold", color: "#4CAF50" },
-  timerText: { fontSize: 18, color: "#D32F2F", fontWeight: "bold" },
 });
 
 export default Dash;

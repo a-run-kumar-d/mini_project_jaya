@@ -7,9 +7,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Dimensions,
-  FlatList,
-  Image,
   ImageBackground,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -61,10 +58,6 @@ const Home = () => {
 
     fetchUserData();
   }, []);
-
-  const handleGenerateWorkoutPlan = () => {
-    // generate workout plan
-  };
 
   const navigation = useNavigation();
 

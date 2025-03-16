@@ -10,6 +10,19 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Button, Provider as PaperProvider } from "react-native-paper";
+import { getAuth, signOut } from "firebase/auth";
+import {
+  getDocs,
+  query,
+  where,
+  collection,
+  doc,
+  addDoc,
+  getFirestore,
+  serverTimestamp,
+} from "firebase/firestore";
+import app from "@/firebaseConfig";
+import { router } from "expo-router";
 
 const questions = [
   {
@@ -86,7 +99,7 @@ const Goal = () => {
   const navigation = useNavigation();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false); // Added modalVisible state
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleOptionSelect = (option) => {
     const updatedSelections = [...selectedOptions];
@@ -120,35 +133,73 @@ const Goal = () => {
     try {
       let exercises = [];
       for (let i = 0; i < allowedMuscle.length; i++) {
-        const response = await fetch(
-          `https://exercisedb-api.vercel.app/api/v1/bodyparts/${allowedMuscle[i]}/exercises`
-        );
-        const data = await response.json();
-        exercises = [...exercises, ...data.data.exercises];
+        let page = 1;
+        while (exercises.length < exerciseCount) {
+          const response = await fetch(
+            `https://exercisedb-api.vercel.app/api/v1/bodyparts/${allowedMuscle[i]}/exercises?page=${page}`
+          );
+          const data = await response.json();
 
-        if (exerciseCount === 3) break;
+          if (!data.data.exercises.length) break; // No more exercises available
+          exercises = [...exercises, ...data.data.exercises];
+          page++;
+        }
+        if (exercises.length >= exerciseCount) break;
       }
 
-      if (exerciseCount > 3 && allowedMuscle.length === 1) {
-        const nextPageResponse = await fetch(
-          `https://exercisedb-api.vercel.app/api/v1/bodyparts/${allowedMuscle[0]}/exercises?page=2`
-        );
-        const nextPageData = await nextPageResponse.json();
-        exercises = [...exercises, ...nextPageData.data.exercises];
-      }
-
-      const filteredExercises = exercises
+      let filteredExercises = exercises
         .filter((exercise) =>
           exercise.equipments.some((equip) => allowedEquipment.includes(equip))
         )
         .slice(0, exerciseCount);
 
+      // If not enough filtered exercises found, take any 3 exercises from the body part
+      if (filteredExercises.length < 3) {
+        filteredExercises = exercises.slice(0, 3);
+      }
+
       console.log(filteredExercises);
+
+      try {
+        const auth = getAuth(app);
+        const userId = auth.currentUser?.uid;
+        if (!userId) throw new Error("User is not authenticated");
+
+        const db = getFirestore(app);
+        const usersCollection = collection(db, "Users");
+        const q = query(usersCollection, where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          throw new Error("User document not found!");
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const userDocId = userDoc.id;
+        const workoutData = collection(doc(db, "Users", userDocId), "Workouts");
+
+        const validExercises = filteredExercises
+          .filter((exercise) => exercise.exerciseId)
+          .map((exercise) => exercise.exerciseId);
+
+        if (!validExercises.length) {
+          console.error("Error: No valid exercises found to save.");
+          return;
+        }
+
+        await addDoc(workoutData, {
+          exercises: validExercises,
+          timestamp: serverTimestamp(),
+        });
+
+        console.log("Workout added successfully!");
+        router.replace("/dash");
+      } catch (error) {
+        console.error("Error adding workout: ", error);
+      }
     } catch (error) {
       console.error(error);
     }
-
-    // navigation.navigate("hard");
   };
 
   return (

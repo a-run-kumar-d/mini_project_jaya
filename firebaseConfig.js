@@ -9,7 +9,7 @@ const firebaseConfig = {
   authDomain: "fitnessapp-ba7ba.firebaseapp.com",
   projectId: "fitnessapp-ba7ba",
   storageBucket: "fitnessapp-ba7ba.firebasestorage.app",
-  appId: "1:391765619680:android:56b8dcfb53beefe3983185"
+  appId: "1:391765619680:android:56b8dcfb53beefe3983185",
 };
 
 // Initialize Firebase
@@ -19,4 +19,4 @@ const db = getFirestore(app);
 
 console.log("🔥 Firebase connected successfully!");
 
-export { auth, db };
+export { auth, db, app };
