@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   ScrollView,
-  Picker,
   TouchableOpacity,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import dietData from "../constants/dietData.json";
 import { getAuth } from "firebase/auth";
 import {
@@ -290,7 +289,7 @@ const styles = StyleSheet.create({
     color: "#D7D8D9", // Match your label color
   },
   picker: {
-    height: 40,
+    height: 60,
     borderColor: "#393C43", // Match your button background
     borderWidth: 1,
     backgroundColor: "#24262B", // Match your stat box background
@@ -354,7 +353,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F97316",
     borderRadius: 10,
     padding: 20,
-    marginBottom: 10,
+    marginTop: 20,
+    marginBottom: 100,
   },
   ctaButtonText: {
     fontSize: 16,

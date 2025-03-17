@@ -10,10 +10,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import Constants from "expo-constants"; // For environment variables
-
-// const GEMINI_API_KEY = AIzaSyBCK2iqZr5GWlg_pPdnmBOvdFKC0T4eQz4;
-
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -27,8 +23,40 @@ const Chat = () => {
 
     try {
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${AIzaSyBCK2iqZr5GWlg_pPdnmBOvdFKC0T4eQz4}`,
-        { prompt: { text: input } }
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
+        {
+          contents: [{ parts: [{ text: input }] }],
+          generationConfig: {
+            temperature: 0.9,
+            topK: 1,
+            topP: 1,
+            maxOutputTokens: 2048,
+          },
+          safetySettings: [
+            {
+              category: "HARM_CATEGORY_HARASSMENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+              category: "HARM_CATEGORY_HATE_SPEECH",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE",
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": "AIzaSyBCK2iqZr5GWlg_pPdnmBOvdFKC0T4eQz4", // Replace with your API key
+          },
+        }
       );
 
       const botReply =
@@ -107,11 +135,12 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: "gray",
+    borderColor: "#393C43",
     borderWidth: 1,
     paddingHorizontal: 10,
     marginBottom: 5,
     borderRadius: 8,
+    color: "#fff",
   },
   sendButton: {
     backgroundColor: "#F97316",
