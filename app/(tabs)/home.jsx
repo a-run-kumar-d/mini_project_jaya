@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import fit from "@/assets/images/Frame.png";
 import { router } from "expo-router";
+import { FontAwesome } from "@expo/vector-icons";
 
 import {
   StyleSheet,
@@ -134,6 +135,13 @@ const Home = () => {
         >
           <Text style={styles.ctaButtonText}>Nutrition Diet</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.ctaButton3}
+          onPress={() => navigation.navigate("chat")}
+        >
+          <Text style={styles.ctaButtonText2}>Chat with Arnold</Text>
+          <FontAwesome name="comment" size={24} color="#111214" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -233,10 +241,27 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+  ctaButtonText2: {
+    fontSize: 20,
+    color: "#111214",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   ctaButton2: {
     backgroundColor: "#393C43",
     borderRadius: 10,
     padding: 20,
+    marginBottom: 10,
+  },
+  ctaButton3: {
+    marginTop: 40,
+    backgroundColor: "#fff",
+    borderRadius: 50,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 20,
     marginBottom: 10,
   },
 });

@@ -94,22 +94,6 @@ const tabsLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="chat"
-          options={{
-            title: "Chat",
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcons
-                icon="qrcode"
-                color={color}
-                name=""
-                focused={focused}
-                main
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="dash"
           options={{
             title: "Dashboard",

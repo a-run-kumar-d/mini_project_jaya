@@ -46,7 +46,7 @@ const SignIn = () => {
         onChangeText={setPassword}
       />
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
     </View>
   );

@@ -20,3 +20,27 @@ const db = getFirestore(app);
 console.log("🔥 Firebase connected successfully!");
 
 export { auth, db, app };
+// import { initializeApp } from "firebase/app";
+// import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+// import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+// import { getFirestore } from "firebase/firestore";
+
+// // Your Firebase configuration
+// const firebaseConfig = {
+//   apiKey: "AIzaSyA5PLT9Y7SKTR-hf29vAamtbLOgmJzAV5U",
+//   authDomain: "fitnessapp-ba7ba.firebaseapp.com",
+//   projectId: "fitnessapp-ba7ba",
+//   storageBucket: "fitnessapp-ba7ba.firebasestorage.app",
+//   appId: "1:391765619680:android:56b8dcfb53beefe3983185",
+// };
+
+// // Initialize Firebase
+// const app = initializeApp(firebaseConfig);
+// const auth = initializeAuth(app, {
+//   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+// });
+// const db = getFirestore(app);
+
+// console.log("🔥 Firebase connected successfully!");
+
+// export { auth, db, app };

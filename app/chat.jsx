@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useState, useRef } from "react";
 import {
-  Button,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,15 +21,16 @@ const Chat = () => {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     try {
+      const prompt = `You are Arnold, a fitness chatbot. You have a intresting personality, you speak like a tough guy and mock people like david goggins when they ask irrelevent question.  Only reply to fitness related questions and in slightly mocking and arrogent tone. Keep your answers crisp and short. User: ${input}`;
       const response = await axios.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
         {
-          contents: [{ parts: [{ text: input }] }],
+          contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.9,
+            temperature: 0.7,
             topK: 1,
             topP: 1,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 256,
           },
           safetySettings: [
             {
@@ -54,7 +54,8 @@ const Chat = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-goog-api-key": "AIzaSyBCK2iqZr5GWlg_pPdnmBOvdFKC0T4eQz4", // Replace with your API key
+            // "x-goog-api-key": "AIzaSyANgbKDZPe4GSVQwPciqTrVaLg5dLXAhic", // api key arunkumar D
+            "x-goog-api-key": "AIzaSyCaWMtV45CbBh4UjRtoFq0fTDyy_aAmMjc", //api jaya
           },
         }
       );
@@ -77,6 +78,11 @@ const Chat = () => {
       ]);
     }
 
+    setInput("");
+  };
+
+  const clearChat = () => {
+    setMessages([]);
     setInput("");
   };
 
@@ -107,9 +113,14 @@ const Chat = () => {
         placeholderTextColor={"#fff"}
       />
 
-      <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-        <Text style={styles.sendButtonText}>Send</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.clearButton} onPress={clearChat}>
+          <Text style={styles.clearButtonText}>Clear</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+          <Text style={styles.sendButtonText}>Send</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -123,12 +134,13 @@ const styles = StyleSheet.create({
     color: "#111214",
     padding: 8,
     borderRadius: 5,
-    marginVertical: 2,
+    marginVertical: 10,
   },
   botText: {
+    width: "70%",
     alignSelf: "flex-start",
-    backgroundColor: "#e5e5ea",
-    color: "#111214",
+    backgroundColor: "#6B7280",
+    color: "#fff",
     padding: 8,
     borderRadius: 5,
     marginVertical: 2,
@@ -142,14 +154,33 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: "#fff",
   },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   sendButton: {
     backgroundColor: "#F97316",
     borderRadius: 15,
     padding: 10,
     alignItems: "center",
     marginBottom: 25,
+    flex: 1,
+    marginRight: 5,
   },
   sendButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  clearButton: {
+    backgroundColor: "#6B7280",
+    borderRadius: 15,
+    padding: 10,
+    alignItems: "center",
+    marginBottom: 25,
+    flex: 1,
+    marginLeft: 5,
+  },
+  clearButtonText: {
     color: "#fff",
     fontWeight: "bold",
   },
