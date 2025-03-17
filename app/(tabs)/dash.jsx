@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
   ScrollView,
 } from "react-native";
@@ -165,7 +166,7 @@ const Dash = () => {
           </View>
         ) : selectedTab === "today" ? (
           todayWorkoutDetails.map((item, index) => (
-            <TouchableOpacity
+            <TouchableWithoutFeedback
               key={item.exerciseId}
               onPress={() => {
                 setExpandedExerciseId(
@@ -181,10 +182,13 @@ const Dash = () => {
                   {/* {expandedExerciseId === item.exerciseId && (
                     <>
                       {item.gifUrl && (
-                        <Image
-                          source={{ uri: item.gifUrl }}
-                          style={styles.gif}
-                        />
+                        <>
+                          <Image
+                            source={{ uri: item.gifUrl }}
+                            style={styles.gif}
+                          />
+                          <Text style={styles.workoutName}>{item.name}</Text>
+                        </>
                       )}
                     </>
                   )} */}
@@ -202,12 +206,12 @@ const Dash = () => {
                         {item.equipments.join(", ")}
                       </Text>
                       <Text style={styles.intructionList}>
-                        Intructions <br></br>
+                        Intructions <Text>{"\n"}</Text>
                         {item.instructions.map((instruction, index) => (
                           <Text style={styles.subText} key={index}>
                             {instruction}
-                            <br></br>
-                            <br></br>
+                            <Text>{"\n"}</Text>
+                            <Text>{"\n"}</Text>
                           </Text>
                         ))}
                       </Text>
@@ -227,7 +231,7 @@ const Dash = () => {
                   )}
                 </Card.Content>
               </Card>
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
           ))
         ) : (
           previousWorkoutDetails.map((item, index) => (
