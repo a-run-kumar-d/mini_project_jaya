@@ -253,7 +253,9 @@ const Dash = () => {
                     {item.timestamp.toDate().toLocaleDateString()}
                   </Text>
                   {item.exercises.map((exercise, exerciseIndex) => (
-                    <Text key={exerciseIndex}>{exercise.name}</Text>
+                    <Text style={styles.subText} key={exerciseIndex}>
+                      {exercise.name}
+                    </Text>
                   ))}
                 </Card.Content>
               </Card>

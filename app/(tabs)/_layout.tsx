@@ -118,7 +118,7 @@ const tabsLayout = () => {
               <TabIcons
                 icon="user"
                 color={color}
-                name="Dashboard"
+                name="Profile"
                 focused={focused}
               />
             ),
