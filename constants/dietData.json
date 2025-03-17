@@ -1,0 +1,170 @@
+[
+  {
+    "goal": "weight loss",
+    "activityLevel": "sedentary",
+    "dietaryRestrictions": "none",
+    "weeklyPlan": {
+      "Monday": {
+        "Breakfast": "Oatmeal with berries and a sprinkle of cinnamon",
+        "Lunch": "Large mixed green salad with grilled chicken breast and light vinaigrette",
+        "Dinner": "Baked cod with steamed broccoli and a small sweet potato"
+      },
+      "Tuesday": {
+        "Breakfast": "Greek yogurt with sliced almonds and a drizzle of honey",
+        "Lunch": "Lentil soup with a whole wheat roll",
+        "Dinner": "Turkey meatballs with zucchini noodles and marinara sauce"
+      },
+      "Wednesday": {
+        "Breakfast": "Scrambled eggs with spinach and mushrooms",
+        "Lunch": "Tuna salad lettuce wraps with avocado slices",
+        "Dinner": "Chicken stir-fry with brown rice and mixed vegetables"
+      },
+      "Thursday": {
+        "Breakfast": "Smoothie with protein powder, spinach, banana, and almond milk",
+        "Lunch": "Quinoa salad with chickpeas, cucumber, and feta cheese",
+        "Dinner": "Shrimp with asparagus and a lemon-herb sauce"
+      },
+      "Friday": {
+        "Breakfast": "Whole wheat toast with avocado and a poached egg",
+        "Lunch": "Vegetable soup with a side of whole grain crackers",
+        "Dinner": "Lean beef with roasted sweet potato and green beans"
+      },
+      "Saturday": {
+        "Breakfast": "Pancakes with fruit",
+        "Lunch": "Turkey and cheese sandwich",
+        "Dinner": "Homemade pizza with vegetables and lean protein"
+      },
+      "Sunday": {
+        "Breakfast": "Scrambled eggs with whole wheat toast",
+        "Lunch": "Pasta salad with grilled chicken",
+        "Dinner": "Lean beef burgers with a side salad"
+      }
+    }
+  },
+  {
+    "goal": "muscle gain",
+    "activityLevel": "moderately active",
+    "dietaryRestrictions": "none",
+    "weeklyPlan": {
+      "Monday": {
+        "Breakfast": "Protein smoothie with banana, peanut butter, and protein powder",
+        "Lunch": "Chicken breast with brown rice and steamed broccoli",
+        "Dinner": "Steak with sweet potato and sautéed spinach"
+      },
+      "Tuesday": {
+        "Breakfast": "Oatmeal with protein powder, berries, and nuts",
+        "Lunch": "Tuna salad sandwich on whole wheat bread with a side of fruit",
+        "Dinner": "Salmon with quinoa and asparagus"
+      },
+      "Wednesday": {
+        "Breakfast": "Scrambled eggs with vegetables and cheese, whole wheat toast",
+        "Lunch": "Turkey meatballs with whole wheat pasta and marinara sauce",
+        "Dinner": "Chicken stir-fry with brown rice and mixed vegetables, extra protein"
+      },
+      "Thursday": {
+        "Breakfast": "Greek yogurt with granola, fruit, and honey",
+        "Lunch": "Lentil soup with whole wheat bread and a side salad",
+        "Dinner": "Lean beef with roasted potatoes and green beans"
+      },
+      "Friday": {
+        "Breakfast": "Protein pancakes with fruit and syrup",
+        "Lunch": "Chicken salad lettuce wraps with avocado and a side of mixed nuts",
+        "Dinner": "Shrimp with brown rice and mixed vegetables"
+      },
+      "Saturday": {
+        "Breakfast": "Eggs with whole wheat toast and avocado",
+        "Lunch": "Roast beef sandwich with a side of sweet potato fries",
+        "Dinner": "Pizza with extra protein and vegetables"
+      },
+      "Sunday": {
+        "Breakfast": "Pancakes with berries and whipped cream",
+        "Lunch": "Pasta with meatballs and marinara sauce",
+        "Dinner": "Burgers with whole wheat buns and a side salad"
+      }
+    }
+  },
+  {
+    "goal": "maintain weight",
+    "activityLevel": "moderately active",
+    "dietaryRestrictions": "vegetarian",
+    "weeklyPlan": {
+      "Monday": {
+        "Breakfast": "Oatmeal with fruit and nuts",
+        "Lunch": "Vegetable curry with brown rice",
+        "Dinner": "Lentil soup with whole wheat bread"
+      },
+      "Tuesday": {
+        "Breakfast": "Greek yogurt with granola and honey",
+        "Lunch": "Quinoa salad with chickpeas and vegetables",
+        "Dinner": "Vegetable stir-fry with tofu"
+      },
+      "Wednesday": {
+        "Breakfast": "Scrambled eggs with spinach and mushrooms",
+        "Lunch": "Vegetable sandwich on whole wheat bread",
+        "Dinner": "Vegetarian chili with cornbread"
+      },
+      "Thursday": {
+        "Breakfast": "Smoothie with fruit and spinach",
+        "Lunch": "Vegetable soup with a side salad",
+        "Dinner": "Vegetarian pizza with extra vegetables"
+      },
+      "Friday": {
+        "Breakfast": "Whole wheat toast with avocado and tomato",
+        "Lunch": "Vegetable burrito bowl",
+        "Dinner": "Vegetable lasagna"
+      },
+      "Saturday": {
+        "Breakfast": "Pancakes with fruit and syrup",
+        "Lunch": "Vegetable quesadilla",
+        "Dinner": "Pasta with marinara sauce and vegetables"
+      },
+      "Sunday": {
+        "Breakfast": "Scrambled eggs with vegetables and cheese",
+        "Lunch": "Vegetable burgers with a side salad",
+        "Dinner": "Vegetable curry with rice"
+      }
+    }
+  },
+  {
+    "goal": "general health",
+    "activityLevel": "lightly active",
+    "dietaryRestrictions": "gluten-free",
+    "weeklyPlan": {
+      "Monday": {
+        "Breakfast": "Gluten-free oatmeal with berries and nuts",
+        "Lunch": "Salad with grilled chicken and vegetables",
+        "Dinner": "Baked salmon with roasted vegetables"
+      },
+      "Tuesday": {
+        "Breakfast": "Greek yogurt with fruit and honey",
+        "Lunch": "Lentil soup with gluten-free bread",
+        "Dinner": "Chicken stir-fry with gluten-free noodles"
+      },
+      "Wednesday": {
+        "Breakfast": "Scrambled eggs with vegetables and cheese",
+        "Lunch": "Tuna salad lettuce wraps with avocado",
+        "Dinner": "Lean beef with roasted potatoes and green beans"
+      },
+      "Thursday": {
+        "Breakfast": "Smoothie with fruit and spinach",
+        "Lunch": "Quinoa salad with vegetables and chickpeas",
+        "Dinner": "Shrimp with asparagus and lemon-herb sauce"
+      },
+      "Friday": {
+        "Breakfast": "Gluten-free toast with avocado and tomato",
+        "Lunch": "Vegetable soup with a side salad",
+        "Dinner": "Chicken with roasted vegetables"
+      },
+      "Saturday": {
+        "Breakfast": "Pancakes with fruit and syrup (gluten-free)",
+        "Lunch": "Turkey and cheese sandwich (gluten-free bread)",
+        "Dinner": "Pizza with gluten-free crust and vegetables"
+      },
+      "Sunday": {
+        "Breakfast": "Scrambled eggs with vegetables and cheese",
+        "Lunch": "Pasta salad with grilled chicken (gluten-free pasta)",
+        "Dinner": "Burgers with gluten-free buns and a side salad"
+      }
+    }
+  }
+]

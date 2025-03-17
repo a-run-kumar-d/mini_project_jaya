@@ -128,6 +128,12 @@ const Home = () => {
             <Text style={styles.ctaButtonText}>Generate New Workout Plan</Text>
           </TouchableOpacity>
         )}
+        <TouchableOpacity
+          style={styles.ctaButton2}
+          onPress={() => navigation.navigate("diet")}
+        >
+          <Text style={styles.ctaButtonText}>Nutrition Diet</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
