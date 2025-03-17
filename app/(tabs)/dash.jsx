@@ -65,7 +65,7 @@ const Dash = () => {
             const todayExercises = workouts[0].exercises || [];
             setTodayWorkouts(todayExercises);
             setPreviousWorkouts(workouts.slice(1, 6));
-
+            console.log("prevworkouts", previousWorkouts[0]);
             // Fetch workout details concurrently using Promise.all
             const workoutDetailsPromises = todayExercises.map(async (id) => {
               const response = await fetch(
@@ -82,8 +82,33 @@ const Dash = () => {
               (item) => item.data
             );
             setTodayWorkoutDetails(extractedWorkoutDetails);
-
             console.log(todayExercises, workouts.slice(1, 6));
+            let previousDetailArray = [];
+            for (let i = 0; i < previousWorkouts.length; i++) {
+              const prevworkoutsDetailsPromises = previousWorkouts[
+                i
+              ].exercises.map(async (id) => {
+                const response = await fetch(
+                  `https://exercisedb-api.vercel.app/api/v1/exercises/${id}`
+                );
+                const data = await response.json();
+                return data;
+              });
+              const previousDetail = await Promise.all(
+                prevworkoutsDetailsPromises
+              );
+              const extractedPreviousDetail = previousDetail.map(
+                (item) => item.data
+              );
+              console.log("Munji");
+              previousDetailArray.push({
+                timestamp: previousWorkouts[i].timestamp,
+                exercises: extractedPreviousDetail,
+              });
+
+              setPreviousWorkoutDetails(previousDetailArray);
+              console.log(previousWorkoutDetails);
+            }
           }
           setLoading(false); // Set loading to false after all data is fetched and processed
         } else {
@@ -96,7 +121,7 @@ const Dash = () => {
     };
 
     fetchWorkouts();
-  }, []);
+  }, [selectedTab]);
 
   // const getImageUrl = async (gifUrl) => {
   //   try {
@@ -235,16 +260,18 @@ const Dash = () => {
           ))
         ) : (
           previousWorkoutDetails.map((item, index) => (
-            <TouchableOpacity key={index}>
+            <TouchableWithoutFeedback key={index}>
               <Card style={styles.card}>
                 <Card.Content>
-                  <Text style={styles.workoutDate}>{item.timestamp}</Text>
+                  <Text style={styles.workoutDate}>
+                    {item.timestamp.toDate().toLocaleDateString()}
+                  </Text>
                   {item.exercises.map((exercise, exerciseIndex) => (
-                    <Text key={exerciseIndex}>{exercise}</Text>
+                    <Text key={exerciseIndex}>{exercise.name}</Text>
                   ))}
                 </Card.Content>
               </Card>
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
           ))
         )}
       </ScrollView>
