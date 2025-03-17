@@ -27,11 +27,12 @@ const Dash = () => {
   const [todayWorkoutDetails, setTodayWorkoutDetails] = useState([]);
   const [previousWorkouts, setPreviousWorkouts] = useState([]);
   const [previousWorkoutDetails, setPreviousWorkoutDetails] = useState([]);
-  const [expandedExerciseId, setExpandedExerciseId] = useState(null); // Track the ID of the expanded exercise
+  const [expandedExerciseId, setExpandedExerciseId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [timerAction, setTimerAction] = useState(false);
   const [timer, setTimer] = useState(60);
   const [gif, setGif] = useState(null);
+  const [activeExerciseIndex, setActiveExerciseIndex] = useState(null);
 
   const navigation = useNavigation();
   const auth = getAuth();
@@ -42,14 +43,14 @@ const Dash = () => {
       try {
         const user = auth.currentUser;
         if (user) {
-          setLoading(true); // Set loading to true before fetching data
+          setLoading(true);
 
           const usersCollection = collection(db, "Users");
           const q = query(usersCollection, where("userId", "==", user.uid));
           const querySnapshot = await getDocs(q);
 
           if (querySnapshot.empty) {
-            setLoading(false); // Set loading to false if no user found
+            setLoading(false);
             return;
           }
 
@@ -65,24 +66,21 @@ const Dash = () => {
             const todayExercises = workouts[0].exercises || [];
             setTodayWorkouts(todayExercises);
             setPreviousWorkouts(workouts.slice(1, 6));
-            console.log("prevworkouts", previousWorkouts[0]);
-            // Fetch workout details concurrently using Promise.all
+
             const workoutDetailsPromises = todayExercises.map(async (id) => {
               const response = await fetch(
                 `https://exercisedb-api.vercel.app/api/v1/exercises/${id}`
               );
               const data = await response.json();
-              return data; // Return the entire data object
+              return data;
             });
 
             const workoutDetails = await Promise.all(workoutDetailsPromises);
-
-            // Extract the data.data part after all promises are resolved
             const extractedWorkoutDetails = workoutDetails.map(
               (item) => item.data
             );
             setTodayWorkoutDetails(extractedWorkoutDetails);
-            console.log(todayExercises, workouts.slice(1, 6));
+
             let previousDetailArray = [];
             for (let i = 0; i < previousWorkouts.length; i++) {
               const prevworkoutsDetailsPromises = previousWorkouts[
@@ -100,40 +98,32 @@ const Dash = () => {
               const extractedPreviousDetail = previousDetail.map(
                 (item) => item.data
               );
-              console.log("Munji");
+
               previousDetailArray.push({
                 timestamp: previousWorkouts[i].timestamp,
                 exercises: extractedPreviousDetail,
               });
 
               setPreviousWorkoutDetails(previousDetailArray);
-              console.log(previousWorkoutDetails);
             }
           }
-          setLoading(false); // Set loading to false after all data is fetched and processed
+          setLoading(false);
         } else {
-          setLoading(false); // Set loading to false if no user is logged in
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error fetching workouts:", error);
-        setLoading(false); // Set loading to false in case of an error
+        setLoading(false);
       }
     };
 
     fetchWorkouts();
   }, [selectedTab]);
 
-  // const getImageUrl = async (gifUrl) => {
-  //   try {
-  //     const response = await fetch(gifUrl);
-  //     const blob = await response.blob();
-  //     const imageUrl = URL.createObjectURL(blob);
-  //     return imageUrl;
-  //   } catch (error) {
-  //     console.error("Error fetching image:", error);
-  //   }
-  const startTimer = () => {
+  const startTimer = (index) => {
+    setActiveExerciseIndex(index);
     setTimerAction(true);
+    setTimer(60);
     const interval = setInterval(() => {
       setTimer((prevTimer) => {
         if (prevTimer === 0) {
@@ -145,9 +135,11 @@ const Dash = () => {
     }, 1000);
     return () => clearInterval(interval);
   };
+
   const closeTimer = () => {
     setTimerAction(false);
     setTimer(60);
+    setActiveExerciseIndex(null);
   };
 
   return (
@@ -179,11 +171,6 @@ const Dash = () => {
       </View>
 
       <ScrollView style={styles.scrollContainer}>
-        {timerAction && (
-          <View style={styles.timerContainer}>
-            <Text style={styles.timerText}>{timer} secs remaining</Text>
-          </View>
-        )}
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#fff" />
@@ -204,30 +191,17 @@ const Dash = () => {
             >
               <Card style={styles.card}>
                 <Card.Content>
-                  {/* {expandedExerciseId === item.exerciseId && (
-                    <>
-                      {item.gifUrl && (
-                        <>
-                          <Image
-                            source={{ uri: item.gifUrl }}
-                            style={styles.gif}
-                          />
-                          <Text style={styles.workoutName}>{item.name}</Text>
-                        </>
-                      )}
-                    </>
-                  )} */}
                   <Text style={styles.workoutName}>{item.name}</Text>
                   {expandedExerciseId === item.exerciseId && (
                     <>
                       <Text style={styles.exerciseText}>
                         <Text style={styles.subText}>Muscles</Text>
-                        {"   "}
+                        {"  "}
                         {item.targetMuscles.join(", ")}
                       </Text>
                       <Text style={styles.exerciseText}>
                         <Text style={styles.subText}>Equipment</Text>
-                        {"   "}
+                        {"  "}
                         {item.equipments.join(", ")}
                       </Text>
                       <Text style={styles.intructionList}>
@@ -240,17 +214,29 @@ const Dash = () => {
                           </Text>
                         ))}
                       </Text>
+
+                      {activeExerciseIndex === index && timerAction && (
+                        <View style={styles.timerContainer}>
+                          <Text style={styles.timerText}>
+                            {timer} secs remaining
+                          </Text>
+                        </View>
+                      )}
                       <TouchableOpacity
                         style={styles.startButton}
                         onPress={() => {
-                          if (!timerAction) {
-                            startTimer();
-                          } else {
+                          if (activeExerciseIndex === index && timerAction) {
                             closeTimer();
+                          } else {
+                            startTimer(index);
                           }
                         }}
                       >
-                        <Text style={styles.exerciseText}>Start</Text>
+                        <Text style={styles.exerciseText}>
+                          {activeExerciseIndex === index && timerAction
+                            ? "Stop"
+                            : "Start"}
+                        </Text>
                       </TouchableOpacity>
                     </>
                   )}
@@ -377,14 +363,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   scrollContainer: {
-    flex: 1, // Ensure the scroll container takes up remaining space
+    flex: 1,
   },
   timerContainer: {
     alignItems: "center",
-    padding: 20,
+    padding: 10,
+    marginBottom: 5,
+    backgroundColor: "#393C43",
+    borderRadius: 10,
+    alignSelf: "center",
+    width: "80%",
   },
   timerText: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
   },
